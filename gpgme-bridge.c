@@ -48,6 +48,26 @@ gpgme_key_t get_key (gpgme_ctx_t ctx, const char *fingerprint)
 }
 
 
+char *extract_from_gpgme_data (gpgme_data_t message)
+{
+    char *ret = NULL;
+
+    size_t message_len = 0;
+    char *buf = gpgme_data_release_and_get_mem (message, &message_len);
+    if (buf && message_len > 0)
+    {
+        // gpgme returns a buffer that is not properly NULL terminated.
+        // So we use memcpy to copy the full buffer into a NULL terminated string.
+        ret = (char *) calloc (1, message_len + 1);
+        ret = (char *) memcpy (ret, buf, message_len);
+        // Free the gpgme provided data
+        gpgme_free (buf);
+    }
+
+    return ret;
+}
+
+
 //----------------------------------------
 // PUBLIC API
 //----------------------------------------
@@ -204,12 +224,7 @@ char *encrypt (const char *fingerprint, const char *message)
         goto free_resources_and_return;
 
     // Extract the cipher text from cipher object
-    size_t cipher_len = 0;
-    ret = gpgme_data_release_and_get_mem (cipher, &cipher_len);
-    if (ret && cipher_len > 0)
-        ret[cipher_len - 1] = '\0';
-
-    // At this point cipher should already be released and no further release is required
+    ret = extract_from_gpgme_data (cipher);
     cipher = NULL;
 
 free_resources_and_return:
@@ -257,12 +272,7 @@ char *decrypt (const char *encrypted_message)
         goto free_resources_and_return;
 
     // Extract the cipher text from cipher object
-    size_t message_len = 0;
-    ret = gpgme_data_release_and_get_mem (message, &message_len);
-    if (ret && message_len > 0)
-        ret[message_len - 1] = '\0';
-
-    // At this point cipher should already be released and no further release is required
+    ret = extract_from_gpgme_data (message);
     message = NULL;
 
 free_resources_and_return:
@@ -274,14 +284,4 @@ free_resources_and_return:
         gpgme_release (ctx);
 
     return ret;
-}
-
-
-void free_cipher_text (char *cipher_text)
-{
-    if (!cipher_text)
-        return;
-
-    gpgme_free (cipher_text);
-    cipher_text = NULL;
 }

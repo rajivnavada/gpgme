@@ -44,9 +44,6 @@ extern "C" {
     // Returns decrypted data that MUST be freed by the caller
     char *decrypt (const char *encrypted_message);
 
-    // Frees memory associate with cipher text. NOTE: this is gpgme allocated memory and needs to be allocated via gpgme_free
-    void free_cipher_text (char *cipher_text);
-
 #ifdef __cplusplus
 }
 #endif
