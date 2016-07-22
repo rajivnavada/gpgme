@@ -126,7 +126,7 @@ func EncryptMessage(message, fingerprint string) (string, error) {
 	if cipher == nil {
 		return "", FailedEncryptionError
 	}
-	defer C.free(cipher)
+	defer C.free(unsafe.Pointer(cipher))
 
 	output := C.GoString(cipher)
 	if output == "" {
@@ -148,7 +148,7 @@ func DecryptMessage(encryptedMessage string) (string, error) {
 	if decryptedMessage == nil {
 		return "", FailedDecryptionError
 	}
-	defer C.free(decryptedMessage)
+	defer C.free(unsafe.Pointer(decryptedMessage))
 
 	output := C.GoString(decryptedMessage)
 	if output == "" {
