@@ -5,6 +5,10 @@
 #include <gpgme.h>
 #include <gpg-error.h>
 
+// Required for ubuntu stock version of libgpgme
+#ifndef GPGME_ENCRYPT_NO_COMPRESS
+#define GPGME_ENCRYPT_NO_COMPRESS 0
+#endif
 
 enum {
     KEY_FINGERPRINT_LEN = 40,
