@@ -180,13 +180,6 @@ free_resources_and_return:
 }
 
 
-// Required for ubuntu stock version of libgpgme
-#ifndef GPGME_ENCRYPT_NO_COMPRESS
-#define GPGME_ENCRYPT_NO_COMPRESS 0
-#endif
-
-
-
 char *encrypt (const char *fingerprint, const char *message)
 {
     if (!fingerprint || !message)
